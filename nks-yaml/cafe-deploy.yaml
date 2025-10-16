@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cafe-deploy
+  labels:
+    app: cafe
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: cafe
+  template:
+    metadata:
+      labels:
+        app: cafe
+    spec:
+      containers:
+      - name: foodcourt-web
+        image: 57856b1a-kr2-registry.container.nhncloud.com/nhn-ncr/foodcourt-web:v1
+        ports:
+          - containerPort: 8080
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: SIDECARS
+            value: "localhost:8081,localhost:8082"
+      - name: coffee-machine
+        image: 57856b1a-kr2-registry.container.nhncloud.com/nhn-ncr/coffee-machine:v1
+        ports:
+          - containerPort: 8081
+        env:
+          - name: PORT
+            value: "8081"
+      - name: drink-dispenser
+        image: 57856b1a-kr2-registry.container.nhncloud.com/nhn-ncr/drink-dispenser:v1
+        ports:
+          - containerPort: 8082
+        env:
+          - name: PORT
+            value: "8082"

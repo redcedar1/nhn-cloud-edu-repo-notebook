@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bakery-deploy
+  labels:
+    app: bakery
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bakery
+  template:
+    metadata:
+      labels:
+        app: bakery
+    spec:
+      containers:
+      - name: foodcourt-web
+        image: 57856b1a-kr2-registry.container.nhncloud.com/nhn-ncr/foodcourt-web:v1
+        ports:
+          - containerPort: 8080
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: SIDECARS
+            value: "localhost:8081,localhost:8082"
+      - name: dough-mixer
+        image: 57856b1a-kr2-registry.container.nhncloud.com/nhn-ncr/dough-mixer:v1
+        ports:
+          - containerPort: 8081
+        env:
+          - name: PORT
+            value: "8081"
+      - name: coffee-machine
+        image: 57856b1a-kr2-registry.container.nhncloud.com/nhn-ncr/coffee-machine:v1
+        ports:
+          - containerPort: 8082
+        env:
+          - name: PORT
+            value: "8082"
